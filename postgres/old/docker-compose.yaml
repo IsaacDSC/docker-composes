@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  database_postgres:
+    image: postgres
+    container_name: "database_postgres"
+    environment:
+      POSTGRES_USER=postgres: "dev"
+      POSTGRES_PASSWORD: "secret"
+    ports:
+      - "5432:5432"
+    volumes:
+      - /home/renatogroffe/Desenvolvimento/Docker-Compose/PostgreSQL:/var/lib/postgresql/data
+    networks:
+      - postgres-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: "pgadmin"
+    environment:
+      PGADMIN_DEFAULT_USERNAME: "dev"
+      PGADMIN_DEFAULT_EMAIL: "isaac8.silva@hotmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "secret"
+    ports:
+      - "8081:80"
+    depends_on:
+      - database_postgres
+    networks:
+      - postgres-network
+
+networks:
+  postgres-network:
+    driver: bridge

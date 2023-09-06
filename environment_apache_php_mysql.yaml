@@ -1,0 +1,37 @@
+version: "3"
+services:
+    database:
+        image: mysql:5.7.20
+        environment:
+            MYSQL_ROOT_PASSWORD: 12345
+            MYSQL_DATABASE: db
+            MYSQL_USER: dbadmin
+            MYSQL_PASSWORD: dbpassword
+        volumes:
+            - "data:/var/lib/mysql"
+    webserver:
+        image: webdevops/apache:alpine
+        depends_on:
+            - php
+        ports: 
+            - "80:80"
+            - "443:443"
+        volumes: 
+            - ".:/var/www/html"
+        environment:
+            WEB_PHP_SOCKET: "php:9000"
+            WEB_PHP_TIMEOUT: 600
+            WEB_DOCUMENT_ROOT: "/var/www/html"
+    php:
+        image: mlalbuquerque/php-laravel
+        build:
+            context: ./dockerfiles
+            dockerfile: php7.1-laravel.dockerfile
+        volumes:
+            - ".:/var/www/html"
+            - "./dockerfiles/config/php.ini:/usr/local/etc/php/php.ini"
+            - "./dockerfiles/config/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
+        environment:
+            PATH: "/root/.composer/vendor/bin:${PATH}"
+volumes:
+    data:
